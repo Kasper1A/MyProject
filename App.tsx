@@ -70,12 +70,17 @@ const App: React.FC = () => {
 
   const shareMoodLog = async () => {
     if (await Sharing.isAvailableAsync()) {
-      const summary = moodLogs.map(log => `${log.date} - ${log.mood}`).join('\n');
-      await Sharing.shareAsync(`Mood Log Summary:\n${summary}`);
+      const uri = moodLogs[0]?.image; // Hämtar bilden från loggarna, se till att den är definierad
+      if (uri) {
+        await Sharing.shareAsync(uri); // Dela bilden
+      } else {
+        Alert.alert('No image to share');
+      }
     } else {
       Alert.alert('Sharing is not available on this device');
     }
   };
+
 
   return (
     <LinearGradient
@@ -90,7 +95,7 @@ const App: React.FC = () => {
       </View>
 
       <Button title="Upload Mood Image" onPress={handleImagePick} />
-
+      <Button title="Share Mood Log" onPress={shareMoodLog} />
 
       <FlatList
         data={moodLogs}
