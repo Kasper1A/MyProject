@@ -1,18 +1,21 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, FlatList, Image, StyleSheet, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Calendar from 'expo-calendar';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Sharing from 'expo-sharing';
+import { NavigationContainer } from '@react-navigation/native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
+// Definiera MoodLog-gränssnittet
 interface MoodLog {
   mood: string;
   date: string;
   image?: string;
 }
 
-const App: React.FC = () => {
+// Skärm för att visa och hantera humörval
+const MoodScreen = ({ }) => {
   const [moodLogs, setMoodLogs] = useState<MoodLog[]>([]);
   const moods = ['😊', '😢', '😐', '😴', '🥰', '🤬', '😂'];
 
@@ -24,7 +27,6 @@ const App: React.FC = () => {
       }
     })();
   }, []);
-
 
   const handleMoodSelect = async (mood: string) => {
     const newLog: MoodLog = { mood, date: new Date().toLocaleString() };
@@ -70,9 +72,9 @@ const App: React.FC = () => {
 
   const shareMoodLog = async () => {
     if (await Sharing.isAvailableAsync()) {
-      const uri = moodLogs[0]?.image; // Hämtar bilden från loggarna, se till att den är definierad
+      const uri = moodLogs[0]?.image;
       if (uri) {
-        await Sharing.shareAsync(uri); // Dela bilden
+        await Sharing.shareAsync(uri);
       } else {
         Alert.alert('No image to share');
       }
@@ -81,12 +83,8 @@ const App: React.FC = () => {
     }
   };
 
-
   return (
-    <LinearGradient
-      colors={['#FFDD44', '#FF8844']}
-      style={styles.container}
-    >
+    <LinearGradient colors={['#FFDD44', '#FF8844']} style={styles.container}>
       <Text style={styles.title}>Select Your Mood</Text>
       <View style={styles.moodButtons}>
         {moods.map((mood) => (
@@ -108,6 +106,31 @@ const App: React.FC = () => {
         )}
       />
     </LinearGradient>
+  );
+};
+
+// Skärm för att visa information om appen
+const InfoScreen = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>App Information</Text>
+      <Text>This is a simple mood tracker app. Track your mood and share it!</Text>
+    </View>
+  );
+};
+
+// Skapa Drawer Navigator för att hantera navigering mellan skärmar
+const Drawer = createDrawerNavigator();
+
+// Huvud App-komponent med navigering
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Drawer.Navigator initialRouteName="Mood">
+        <Drawer.Screen name="Mood" component={MoodScreen} />
+        <Drawer.Screen name="Info" component={InfoScreen} />
+      </Drawer.Navigator>
+    </NavigationContainer>
   );
 };
 
